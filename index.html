@@ -226,6 +226,24 @@ details.more[open]>summary::before{content:"−"}
 .chip.on{background:var(--petrol-soft);color:var(--petrol)}
 .editor{border-color:var(--petrol);box-shadow:0 0 0 4px var(--petrol-soft)}
 
+/* Financeiro */
+.subtabs{display:flex;width:100%;box-sizing:border-box}
+.subtabs button{flex:1;text-align:center;padding:9px 6px}
+.finfil{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}
+.finfil .chipsel{flex:1;min-width:0}
+.dre tr.sub td{color:var(--muted);font-size:13px}
+.dre tr.tot td{font-weight:800;border-top:2px solid var(--line);background:var(--soft)}
+.catrow{all:unset;box-sizing:border-box;cursor:pointer;display:grid;grid-template-columns:minmax(110px,1.1fr) 2fr auto;gap:12px;align-items:center;width:100%;padding:10px 6px;border-top:1px solid var(--line);font-size:14px}
+.catrow:first-of-type{border-top:0}
+.catrow .cn{font-weight:700}
+.catrow .prog{height:10px}
+.catrow .prog>span{display:block;height:100%;background:var(--orange);border-radius:6px}
+.catrow[aria-pressed="true"]{background:var(--orange-soft);border-radius:10px}
+.catlist{display:flex;flex-direction:column;gap:8px}
+.catedit{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center}
+.catedit input{min-width:0;background:var(--soft);border:1px solid var(--line);border-radius:10px;padding:9px 12px;font-size:15px}
+@media (max-width:600px){.finfil{flex-direction:column;align-items:stretch}.finfil .field select{width:100%}.dre .ant,.hm{display:none}.dre td,.dre th{padding-left:4px;padding-right:4px}}
+@media (max-width:520px){.catrow{grid-template-columns:1fr auto}.catrow .prog{grid-column:1/-1;grid-row:2}}
 /* Sócias */
 .who{display:flex;flex-direction:column;gap:14px}
 .who .head2{display:flex;gap:12px;align-items:center}
@@ -483,7 +501,7 @@ function ilus(a){if(a.foto)return `<img src="${esc(a.foto)}" alt="Foto: ${esc(a.
 
 /* ---------- estado ---------- */
 const S={ativos:{},vendas:[],lancamentos:[],financiamentos:{},pendencias:[],config:{},fornecedores:[],produtos:[],movimentos:[],ready:{},me:null,canWrite:true};
-const UI={tab:"inicio",maq:"tudo",per:null,estLocal:"deposito",cad:"pontos",ponto:"g1",editForn:null,editProd:null,confirmDel:null,busca:"",pfCat:"todas",pfForn:"todos",hFil:"todos",pendEdit:{},sep:{}};
+const UI={tab:"inicio",maq:"tudo",per:null,estLocal:"deposito",cad:"pontos",ponto:"g1",editForn:null,editProd:null,confirmDel:null,busca:"",pfCat:"todas",pfForn:"todos",hFil:"todos",fin:"resultado",fneg:"tudo",fcat:"todas",pendEdit:{},sep:{}};
 try{UI.sep=JSON.parse(localStorage.getItem("ahshe-sep-"+HOJE)||"{}")}catch(e){}
 /* telas: [id, título, ícone, aparece na barra de baixo] */
 const TABS=[["inicio","Início",I.home,1],["abastecer","Abastecer PDV",I.truck,1],["estoque","Estoque",I.box,1],["financeiro","Financeiro",I.wallet,1],["mais","Mais",I.dots,1],["comprar","Abastecer Estoque",I.cart,0],["vendas","Vendas",I.chart,0],["pendencias","Pendências",I.todo,0]];
@@ -527,7 +545,7 @@ function lucroEntre(ini,fim,ids){
     else if(cl.tipo==="escalonado"&&cl.faixas){const f=cl.faixas.find(f=>f.ate==null||f.ate===""||rc<=+f.ate);R.local+=rc*((f&&+f.pct)||0)/100}
     if(a.tipo==="vending"||rc>0)R.fixos+=((+a.sistema||0)+(+a.energia||0))*dd/30.4;
   });
-  const negs=[...ids];if(ids.includes("g1")&&ids.includes("g2"))negs.push("geladeiras");
+  const negs=negsDe(ids);
   R.desp=S.lancamentos.filter(l=>l.tipo==="despesa"&&negs.includes(l.negocio)&&l.data>=ini&&l.data<=fim&&!(l.negocio==="mm"&&l.pagoPor==="Dinheiro do empréstimo")).reduce((s,l)=>s+(+l.valor||0),0);
   R.bruto=R.receita-R.custo;R.lucro=R.bruto-R.taxas-R.local-R.fixos-R.desp;return R;
 }
@@ -648,7 +666,7 @@ function renderTabs(){
   const tt=$("#toptitle");if(tt)tt.innerHTML=UI.tab==="inicio"?"":`<button class="backbtn" data-tab="inicio" aria-label="Voltar ao início">${I.back}</button>${esc(cur?cur[1]:"")}`;
   const lg=$("#topbar .logo");if(lg)lg.hidden=UI.tab!=="inicio";
 }
-function setTab(t){if(t==="geladeiras"||t==="villabella")t="vendas";if(t==="socias")t="financeiro";if(t==="cadastros")t="mais";UI.tab=t;UI.confirmDel=null;try{history.replaceState(null,"","#"+t)}catch(e){}renderTabs();render();window.scrollTo(0,0)}
+function setTab(t){if(t==="geladeiras"||t==="villabella")t="vendas";if(t==="socias"){t="financeiro";UI.fin="socias"}if(t==="cadastros")t="mais";UI.tab=t;UI.confirmDel=null;try{history.replaceState(null,"","#"+t)}catch(e){}renderTabs();render();window.scrollTo(0,0)}
 function render(){
   const m=$("#main");
   if(!DB){m.innerHTML=`<div class="loading">Entrando…</div>`;return}
@@ -721,7 +739,7 @@ function vInicio(){
       ${tile("comprar",I.cart,"Abastecer Estoque","compras e entradas")}
       ${tile("estoque",I.box,"Estoque",acab?acab+" para olhar":"depósito e pontos","",acab)}
       ${tile("vendas",I.chart,"Vendas","por ponto e dia")}
-      ${tile("financeiro",I.wallet,"Financeiro","lucro e sócias")}
+      ${tile("financeiro",I.wallet,"Financeiro","resultado, despesas e sócias")}
       ${tile("pendencias",I.todo,"Pendências",np?np+" para resolver":"tudo resolvido","warm",np)}
     </div>
     ${S.canWrite?`<div class="shortcuts">
@@ -884,8 +902,92 @@ function movHist(loc){const ms=S.movimentos.filter(m=>m.local===loc||m.de===loc|
     const t=m.tipo==="reposicao"?`Reposição ${esc(LOCAIS[m.de]||m.de)} → ${esc(LOCAIS[m.para]||m.para)}`:m.tipo==="contagem"?`Contagem em ${esc(LOCAIS[m.local])}`:`Ajuste em ${esc(LOCAIS[m.local])}${m.motivo?" ("+esc(m.motivo)+")":""}`;
     return `<tr><td class="num">${fmtDM(m.data)}</td><td>${t}<br><span class="note">${(m.itens||[]).slice(0,4).map(i=>esc(nome(i.produtoId))+" ×"+n0(i.qtd)).join(" · ")}${(m.itens||[]).length>4?" …":""}</span></td><td class="r">${n0(n)} un</td><td class="r">${S.canWrite?(UI.confirmDel===m.id?`<button class="btn small danger" data-delx="movimentos/${esc(m.id)}">Confirmar</button>`:`<button class="btn small ghost" data-askdelx="${esc(m.id)}">Excluir</button>`):""}</td></tr>`}).join("")}</tbody></table></div></div>`}
 
-/* ----- Sócias ----- */
+/* ----- Financeiro ----- */
+const CATDESP0=["Reposição e frete","Manutenção","Perdas e vencidos","Embalagens e limpeza","Taxas bancárias","Outros"];
+function catsDesp(){const base=S.config.catDespesa&&S.config.catDespesa.length?S.config.catDespesa:CATDESP0;return [...new Set([...base,...S.lancamentos.filter(l=>l.tipo==="despesa"&&l.categoria).map(l=>l.categoria)])]}
+const todosIds=()=>ativosList().map(a=>a.id);
+/* negócio de cada financiamento: campo "negocio" no cadastro ou, sem ele, empréstimo = Villa Bella e os outros = as duas geladeiras */
+const finNeg=(id,f)=>f.negocio||(id==="emprestimo"?"mm":"geladeiras");
+function finPeso(id,f,ids){const n=finNeg(id,f);if(n==="geral")return ids.length>=todosIds().length?1:0;if(ids.includes(n))return 1;
+  if(n==="geladeiras")return (ids.includes("g1")?.5:0)+(ids.includes("g2")?.5:0);return 0}
+function parcelasEntre(ini,fim,ids){let tot=0;Object.entries(S.financiamentos).forEach(([id,f])=>{const w=finPeso(id,f,ids);if(!w)return;
+  cronograma(f).forEach(c=>{const d=isoD(c.dt);if(d>=ini&&d<=fim)tot+=c.valor*w})});return tot}
+function negsDe(ids){const n=[...ids];if(ids.includes("g1")&&ids.includes("g2"))n.push("geladeiras");if(ids.length>=todosIds().length)n.push("geral");return n}
+const viaEmprestimo=l=>l.negocio==="mm"&&l.pagoPor==="Dinheiro do empréstimo";
+
 function vFinanceiro(){
+  const sub=["resultado","despesas","socias","financiamentos"].includes(UI.fin)?UI.fin:"resultado";
+  const subs=[["resultado","Resultado"],["despesas","Despesas"],["socias","Sócias"],["financiamentos","Financiamentos"]];
+  const comFiltro=sub==="resultado"||sub==="despesas";
+  let filtros="",per=null,prev=null,ids=todosIds();
+  if(comFiltro){const ps=periodos();if(!UI.per||(UI.per!=="tudo"&&!ps.find(p=>p.ini===UI.per))){const pr=periodoRef();UI.per=pr?pr.ini:"tudo"}
+    const i=ps.findIndex(p=>p.ini===UI.per);per=UI.per==="tudo"||i<0?{ini:"0000",fim:"9999",label:"desde o início",tudo:true}:ps[i];prev=i>0?ps[i-1]:null;
+    const as=ativosList();const fneg=UI.fneg&&UI.fneg!=="tudo"&&S.ativos[UI.fneg]?UI.fneg:"tudo";ids=fneg==="tudo"?ids:[fneg];
+    filtros=`<div class="finfil"><div class="chipsel" role="group" aria-label="Negócio"><button data-fneg="tudo" aria-pressed="${fneg==="tudo"}">Tudo</button>${as.map(x=>`<button data-fneg="${x.id}" aria-pressed="${x.id===fneg}">${esc(curto(x))}</button>`).join("")}</div>
+      <div class="field"><label for="fin-per">Período</label><select id="fin-per" data-per>${ps.map(p=>`<option value="${p.ini}"${UI.per===p.ini?" selected":""}>${esc(p.label)}</option>`).join("")}<option value="tudo"${UI.per==="tudo"?" selected":""}>Desde o início</option></select></div></div>`}
+  const corpo=sub==="resultado"?finResultado(per,prev,ids):sub==="despesas"?finDespesas(per,ids):sub==="socias"?finSocias():finFinanciamentos();
+  return `<div class="head"><div><h1>Financeiro</h1><p>Resultado, despesas, parte de cada uma e parcelas</p></div></div>
+  <section>
+    <div class="seg subtabs" role="tablist" aria-label="Partes do financeiro">${subs.map(([k,l])=>`<button role="tab" data-fin="${k}" aria-pressed="${k===sub}" aria-selected="${k===sub}">${l}</button>`).join("")}</div>
+    ${S.canWrite?`<div class="shortcuts"><button class="shortcut" data-sheet="despesa" data-neg="${ids.length===1?esc(ids[0]):"geral"}">${I.coin}Lançar despesa</button><button class="shortcut" data-sheet="repasse">${I.swap}Lançar repasse</button></div>`:""}
+    ${filtros}
+    ${corpo}
+  </section>`;
+}
+
+function finResultado(per,prev,ids){
+  const R=lucroEntre(per.ini,per.fim,ids);const parc=parcelasEntre(per.ini,per.fim,ids);const sobra=R.lucro-parc;
+  if(!R.dias&&!R.desp&&!parc)return `<div class="card"><div class="alert">${I.alert}<span>Sem vendas importadas neste período.</span>${S.canWrite?`<button class="btn small" data-sheet="importar">Importar</button>`:""}</div></div>`;
+  const P=prev?lucroEntre(prev.ini,prev.fim,ids):null;const pparc=prev?parcelasEntre(prev.ini,prev.fim,ids):0;const comp=P&&P.dias;
+  const est=taxaEstimada("debito")?'<span class="est">taxas est.</span>':"";
+  const cor=v=>v<0?"var(--bad)":"var(--ok)";
+  const var_=(a,b)=>{if(!comp)return "";const d=a-b;return `<td class="r note ant">${brl0(b)}</td><td class="r" style="color:${Math.abs(d)<0.5?"var(--muted)":d>0?"var(--ok)":"var(--bad)"};font-weight:700">${Math.abs(d)<0.5?"=":(d>0?"+":"−")+brl0(Math.abs(d))}</td>`};
+  const ln=(k,v,pv,cls="")=>`<tr class="${cls}"><td>${k}</td><td class="r">${brl(v)}</td>${var_(v,pv)}</tr>`;
+  const negativo=(k,v,pv)=>ln(k,-v,-pv);
+  const linhas=[ln("Vendas",R.receita,P&&P.receita),negativo("Custo dos produtos",R.custo,P&&P.custo),ln("Margem dos produtos",R.receita-R.custo,P&&(P.receita-P.custo),"sub"),
+    negativo("Taxas de cartão e Pix",R.taxas,P&&P.taxas),negativo("Local (comissão ou aluguel)",R.local,P&&P.local),negativo("Sistema e energia",R.fixos,P&&P.fixos),negativo("Despesas",R.desp,P&&P.desp),
+    ln("Lucro da operação",R.lucro,P&&P.lucro,"tot"),negativo("Parcelas dos financiamentos",parc,pparc),ln("Sobra para as sócias",sobra,P&&(P.lucro-pparc),"tot"),ln("Cada uma (50%)",sobra/2,P&&(P.lucro-pparc)/2,"sub")];
+  let porNeg="";
+  if(ids.length>1){const as=ativosList();let sL=0,sP=0;
+    const rows=as.map(a=>{const r=lucroEntre(per.ini,per.fim,[a.id]);const p=parcelasEntre(per.ini,per.fim,[a.id]);sL+=r.lucro;sP+=p;
+      return `<tr><td><b style="font-weight:700">${esc(a.nome)}</b></td><td class="r hm">${brl0(r.receita)}</td><td class="r" style="color:${r.lucro<0?"var(--bad)":"inherit"}">${brl0(r.lucro)}</td><td class="r">${p?"−"+brl0(p):"—"}</td><td class="r" style="color:${r.lucro-p<0?"var(--bad)":"inherit"};font-weight:800">${brl0(r.lucro-p)}</td></tr>`}).join("");
+    const resto=R.lucro-sL,rp=parc-sP;
+    porNeg=`<div class="card"><h2 style="margin-bottom:6px">Cada negócio</h2><p class="sub" style="margin-bottom:8px">Lucro da operação e sobra depois das parcelas, lado a lado</p>
+      <div class="tbl"><table><thead><tr><th>Negócio</th><th class="r hm">Vendeu</th><th class="r">Lucro</th><th class="r">Parcelas</th><th class="r">Sobra</th></tr></thead><tbody>${rows}
+      ${Math.abs(resto)>0.5||Math.abs(rp)>0.5?`<tr><td class="note">Gerais e das duas geladeiras</td><td class="hm"></td><td class="r">${brl0(resto)}</td><td class="r">${Math.abs(rp)>0.5?"−"+brl0(rp):"—"}</td><td class="r">${brl0(resto-rp)}</td></tr>`:""}</tbody></table></div></div>`}
+  return `<div class="card"><h2 style="margin-bottom:12px">${esc(per.label[0].toUpperCase()+per.label.slice(1))}${per.aberto?' <span class="note">(até hoje)</span>':""}</h2>
+      <div class="big3"><div><div class="k">Vendeu</div><div class="v">${brl0(R.receita)}</div></div><div><div class="k">Lucro da operação${est}</div><div class="v" style="color:${cor(R.lucro)}">${brl0(R.lucro)}</div></div><div><div class="k">Sobra para as sócias</div><div class="v" style="color:${cor(sobra)}">${brl0(sobra)}</div></div></div></div>
+    <div class="card"><h2 style="margin-bottom:6px">De onde veio e para onde foi</h2><p class="sub" style="margin-bottom:8px">${comp?"Comparado com "+esc(prev.label):"Conta completa do período"}</p>
+      <div class="tbl"><table class="dre">${comp?`<thead><tr><th></th><th class="r">Este período</th><th class="r ant">Anterior</th><th class="r">Diferença</th></tr></thead>`:""}<tbody>${linhas.join("")}</tbody></table></div>
+      <p class="note" style="margin-top:10px"><b>Lucro da operação</b> mostra se os negócios dão lucro. <b>Sobra para as sócias</b> desconta as parcelas do cartão e do empréstimo que vencem no período: é o que fica de fato.${per.aberto?" O período ainda está aberto, então os números vão mudar.":""}</p></div>
+    ${porNeg}`;
+}
+
+function finDespesas(per,ids){
+  const negs=negsDe(ids);const cats=catsDesp();
+  const doPer=S.lancamentos.filter(l=>l.tipo==="despesa"&&negs.includes(l.negocio)&&l.data>=per.ini&&l.data<=per.fim);
+  const cat=l=>l.categoria||"Sem categoria";
+  const tot={};doPer.filter(l=>!viaEmprestimo(l)).forEach(l=>tot[cat(l)]=(tot[cat(l)]||0)+(+l.valor||0));
+  const total=Object.values(tot).reduce((s,v)=>s+v,0);const ord=Object.entries(tot).sort((a,b)=>b[1]-a[1]);
+  const fcat=UI.fcat&&UI.fcat!=="todas"?UI.fcat:"todas";
+  const lista=doPer.filter(l=>fcat==="todas"||cat(l)===fcat).sort((x,y)=>((y.data||"")+(y.criadoEm||""))<((x.data||"")+(x.criadoEm||""))?-1:1);
+  const emp=doPer.filter(viaEmprestimo).reduce((s,l)=>s+(+l.valor||0),0);
+  const inv=S.lancamentos.filter(l=>l.tipo==="investimento"&&negs.includes(l.negocio)&&l.data>=per.ini&&l.data<=per.fim).reduce((s,l)=>s+(+l.valor||0),0);
+  const dis=S.canWrite?"":" disabled";
+  return `<div class="card"><div class="card-head"><div><h2>Para onde foi o dinheiro</h2><p class="sub">${doPer.length} despesa${doPer.length===1?"":"s"} · ${brl(total)} entram no lucro</p></div></div>
+      ${ord.length?ord.map(([k,v])=>`<button class="catrow" data-fcat="${esc(fcat===k?"todas":k)}" aria-pressed="${fcat===k}"><span class="cn">${esc(k)}</span><span class="prog"><span style="width:${total?Math.max(3,v/total*100):0}%"></span></span><b class="num">${brl0(v)}</b></button>`).join("")
+        :`<div class="empty">Nenhuma despesa lançada neste período.${S.canWrite?`<br><button class="btn small" style="margin-top:10px" data-sheet="despesa" data-neg="${ids.length===1?esc(ids[0]):"geral"}">Lançar a primeira</button>`:""}</div>`}
+      ${emp||inv?`<p class="note" style="margin-top:10px">${emp?`Pagas com o dinheiro do empréstimo (não entram no lucro): ${brl(emp)}. `:""}${inv?`Equipamentos e obras no período (investimento, fora do lucro): ${brl(inv)}.`:""}</p>`:""}</div>
+    ${doPer.length?`<div class="card"><div class="card-head"><div><h2>${fcat==="todas"?"Todas as despesas":esc(fcat)}</h2><p class="sub">${lista.length} lançamento${lista.length===1?"":"s"} · ${brl(lista.reduce((s,l)=>s+(+l.valor||0),0))}</p></div>
+      <div class="field"><label for="fin-cat">Categoria</label><select id="fin-cat" data-pf="fcat"><option value="todas">Todas</option>${[...new Set([...cats,...doPer.map(cat)])].map(c=>`<option${fcat===c?" selected":""}>${esc(c)}</option>`).join("")}</select></div></div>
+      ${lista.length?histTable(lista,true):`<div class="empty">Nada nesta categoria.</div>`}</div>`:""}
+    <div class="card"><details class="more"><summary>Categorias de despesa</summary>
+      <p class="note" style="margin:10px 0">Renomear muda também as despesas já lançadas com aquele nome.</p>
+      <div class="catlist">${cats.map(c=>`<form class="catedit" data-form="catren" data-old="${esc(c)}"><input name="nome" value="${esc(c)}" aria-label="Nome da categoria ${esc(c)}"${dis}><span class="note">${S.lancamentos.filter(l=>l.tipo==="despesa"&&l.categoria===c).length} lanç.</span><button class="btn small" type="submit"${dis}>Renomear</button></form>`).join("")}
+      <form class="catedit" data-form="catnova"><input name="nome" placeholder="Nova categoria" aria-label="Nova categoria"${dis}><span></span><button class="btn small primary" type="submit"${dis}>Criar</button></form></div></details></div>`;
+}
+
+function finSocias(){
   const ex=extrato();const [A,B]=SOCIAS();const modo=S.config.fechamento||"mes";const dis=S.canWrite?"":" disabled";
   const col=p=>{const bg=p.saldo>0.01?"var(--orange-soft)":p.saldo<-0.01?"var(--petrol-soft)":"var(--ok-soft)";
     return `<div class="card who"><div class="head2"><div class="av">${esc(p.nome[0])}</div><div><h2>${esc(p.nome)}</h2><p class="sub">50% de tudo${p.isConta?" · as vendas caem na conta dela":""}</p></div></div>
@@ -893,26 +995,30 @@ function vFinanceiro(){
       <dl class="facts"><dt>Parte dela no lucro, desde o início</dt><dd>${brl(p.parte)}</dd><dt>${p.isConta?"Ficou na conta dela":"Já recebeu"}</dt><dd>${brl(p.comConta)}</dd><dt>Pagou do bolso (parcelas e compras)</dt><dd>${brl(p.bolso)}</dd>${p.deveAc?`<dt>Deve de acerto de despesas</dt><dd style="color:var(--warn)">${brl(p.deveAc)}</dd>`:""}<dt>Investimento dela</dt><dd>${brl0(p.inv)}</dd></dl>
       <div><div style="display:flex;justify-content:space-between;font-size:13px;font-weight:700;color:var(--muted);margin-bottom:6px"><span>Já voltou do investimento</span><span>${pct(p.inv?p.parte/p.inv:0,1)}</span></div><div class="prog p"><div style="width:${Math.min(100,Math.max(0,p.inv?p.parte/p.inv*100:0))}%"></div></div></div></div>`};
   const st={pago:["ok","Repassado"],parcial:["warn","Parcial"],areceber:["bad","A repassar"],aberto:["info","Em andamento"],zero:["",""],info:["",""]};
-  const fins=Object.entries(S.financiamentos).map(([id,f])=>({id,f,r:finResumo(f)}));
-  const per=periodoRef();const Rp=per?lucroEntre(per.ini,per.fim,ativosList().map(a=>a.id)):null;
-  return `<div class="head"><div><h1>Financeiro</h1><p>Lucro, parte de cada uma, repasses e parcelas</p></div></div>
-  <section>
-    ${S.canWrite?`<div class="shortcuts"><button class="shortcut" data-sheet="repasse">${I.swap}Lançar repasse</button><button class="shortcut" data-sheet="despesa" data-neg="geral">${I.coin}Lançar despesa</button></div>`:""}
-    ${Rp&&Rp.dias?`<div class="strip"><h2>Período ${esc(per.label)}${per.aberto?" (até hoje)":""}</h2><div><div class="k">Vendeu</div><div class="v">${brl0(Rp.receita)}</div></div><div><div class="k">Sobrou</div><div class="v">${brl0(Rp.lucro)}</div></div><div><div class="k">Cada uma</div><div class="v">${brl0(Rp.lucro/2)}</div></div></div>`:""}
-    <div class="grid g2">${col(ex.A)}${col(ex.B)}</div>
-    <div class="card"><div class="card-head"><div><h2>Mês a mês</h2><p class="sub">O que sobrou em cada período e quanto já foi repassado${ex.ultV?" · vendas importadas até "+fmtDM(ex.ultV):""}</p></div></div>
-      <div class="tbl"><table><thead><tr><th>Período</th><th class="r">Vendeu</th><th class="r">Sobrou</th><th class="r">Cada uma</th>${ex.alvo?`<th class="r">Repassado</th><th></th>`:""}</tr></thead><tbody>
+  const ac=acerto();
+  return `<div class="grid g2">${col(ex.A)}${col(ex.B)}</div>
+    <div class="card"><h2>Acerto de despesas</h2><p class="sub" style="margin-bottom:8px">Quando uma paga algo do bolso, a outra deve metade</p><p style="font-weight:800;font-size:17px;margin:0">${Math.abs(ac.saldo)<0.01?"Ninguém deve nada":ac.saldo>0?`${esc(B)} deve ${brl(ac.saldo)} a ${esc(A)}`:`${esc(A)} deve ${brl(-ac.saldo)} a ${esc(B)}`}</p></div>
+    <div class="card"><div class="card-head"><div><h2>Repasses mês a mês</h2><p class="sub">O lucro da operação de cada período e quanto já foi repassado${ex.ultV?" · vendas importadas até "+fmtDM(ex.ultV):""}</p></div></div>
+      <div class="tbl"><table><thead><tr><th>Período</th><th class="r">Vendeu</th><th class="r">Lucro</th><th class="r">Cada uma</th>${ex.alvo?`<th class="r">Repassado</th><th></th>`:""}</tr></thead><tbody>
       ${ex.ps.slice().reverse().map(p=>{if(p.semDados)return `<tr><td>${esc(p.label)}</td><td colspan="${ex.alvo?5:3}" class="note">Aguardando o relatório de vendas</td></tr>`;const s=st[p.status]||["",""];return `<tr><td>${esc(p.label)}${p.aberto?' <span class="note">(até hoje)</span>':""}</td><td class="r">${brl0(p.receita)}</td><td class="r" style="color:${p.lucro<0?"var(--bad)":"inherit"}">${brl0(p.lucro)}</td><td class="r">${brl(p.parte)}</td>${ex.alvo?`<td class="r">${brl(p.pago)}</td><td>${s[1]?`<span class="pill ${s[0]}">${s[1]}</span>`:""}</td>`:""}</tr>`}).join("")}
       </tbody></table></div>
       <details class="more"><summary>Regras do cálculo</summary><div style="display:flex;flex-direction:column;gap:12px;margin-top:12px">
         <div class="form"><div class="field"><label>Fechamento</label><div class="seg"><button data-fech="mes" aria-pressed="${modo==="mes"}"${dis}>Mês fechado</button><button data-fech="dia20" aria-pressed="${modo==="dia20"}"${dis}>Dia 20 a 19</button></div></div>
         <div class="field"><label for="cfg-conta">As vendas caem na conta de</label><select id="cfg-conta" data-cfg="contaVendas"${dis}>${[[A,A],[B,B],["empresa","Conta da empresa"]].map(([v,l])=>`<option value="${esc(v)}"${ex.conta===v?" selected":""}>${esc(l)}</option>`).join("")}</select></div></div>
-        <p class="note">Sobrou = vendas − custo dos produtos − taxas − local − sistema e energia − despesas. As parcelas do cartão e do empréstimo não entram: cada uma paga a sua metade, e isso aparece em "Pagou do bolso".</p></div></details></div>
-    <div class="grid g2">${fins.map(({f,r})=>`<div class="card"><div class="card-head"><div><h2>${esc(f.nome)}</h2><p class="sub">${esc(f.obs||"")}</p></div><span class="pill ${r.pagas>=f.n?"ok":"info"}">${r.pagas} de ${f.n}</span></div>
-      <div class="prog p"><div style="width:${r.pagas/f.n*100}%"></div></div>
-      <dl class="facts" style="margin-top:12px"><dt>Parcela</dt><dd>${brl(f.parcela)} · ${brl(f.parcela/2)} cada</dd><dt>Falta pagar</dt><dd>${brl0(r.resta)}</dd><dt>Próxima</dt><dd>${r.prox?(r.prox.diaIncerto?fmtMesC(r.prox.mes):fmtData(isoD(r.prox.dt))):"Quitado"}</dd></dl></div>`).join("")}</div>
-    ${(()=>{const ac=acerto();return `<div class="card"><h2>Acerto de despesas</h2><p class="sub" style="margin-bottom:8px">Quando uma paga algo do bolso, a outra deve metade</p><p style="font-weight:800;font-size:17px;margin:0">${Math.abs(ac.saldo)<0.01?"Ninguém deve nada":ac.saldo>0?`${esc(B)} deve ${brl(ac.saldo)} a ${esc(A)}`:`${esc(A)} deve ${brl(-ac.saldo)} a ${esc(B)}`}</p></div>`})()}
-  </section>`;
+        <p class="note">O repasse é feito sobre o lucro da operação (vendas − custo dos produtos − taxas − local − sistema e energia − despesas). As parcelas do cartão e do empréstimo ficam fora: cada uma paga a sua metade, e isso aparece em "Pagou do bolso". Em Resultado dá para ver a sobra depois das parcelas.</p></div></details></div>`;
+}
+
+function finFinanciamentos(){
+  const fins=Object.entries(S.financiamentos).map(([id,f])=>({id,f,r:finResumo(f)}));
+  if(!fins.length)return `<div class="card empty">Nenhum financiamento cadastrado.</div>`;
+  const ativos=fins.filter(x=>x.r.prox);const resta=fins.reduce((s,x)=>s+x.r.resta,0);const mensal=ativos.reduce((s,x)=>s+(+x.f.parcela||0),0);
+  const prox=[];ativos.forEach(({f,r})=>r.c.filter(c=>!c.pago).slice(0,6).forEach(c=>prox.push({nome:f.nome,c})));prox.sort((a,b)=>a.c.dt-b.c.dt);
+  const quando=c=>c.diaIncerto?fmtMesC(c.mes):fmtData(isoD(c.dt));
+  return `<div class="card"><div class="big3"><div><div class="k">Falta pagar</div><div class="v">${brl0(resta)}</div></div><div><div class="k">Parcelas por mês</div><div class="v">${brl0(mensal)}</div></div><div><div class="k">Cada uma por mês</div><div class="v">${brl0(mensal/2)}</div></div></div></div>
+    <div class="grid g2">${fins.map(({id,f,r})=>`<div class="card"><div class="card-head"><div><h2>${esc(f.nome)}</h2><p class="sub">${esc(f.obs||NEG[finNeg(id,f)]||"")}</p></div><span class="pill ${r.pagas>=f.n?"ok":"info"}">${r.pagas} de ${f.n}</span></div>
+      <div class="prog p"><div style="width:${f.n?r.pagas/f.n*100:0}%"></div></div>
+      <dl class="facts" style="margin-top:12px"><dt>Parcela</dt><dd>${brl(f.parcela)} · ${brl(f.parcela/2)} cada</dd><dt>Já pago</dt><dd>${brl0(r.pago)}</dd><dt>Falta pagar</dt><dd>${brl0(r.resta)}</dd>${r.juros>0?`<dt>Juros no total</dt><dd>${brl0(r.juros)}</dd>`:""}<dt>Próxima</dt><dd>${r.prox?quando(r.prox):"Quitado"}</dd><dt>Última</dt><dd>${r.c.length?quando(r.c[r.c.length-1]):"—"}</dd></dl></div>`).join("")}</div>
+    ${prox.length?`<div class="card"><h2 style="margin-bottom:6px">Próximas parcelas</h2><div class="tbl"><table><tbody>${prox.slice(0,8).map(x=>`<tr><td class="num">${quando(x.c)}</td><td>${esc(x.nome)} <span class="note">· parcela ${x.c.k}</span></td><td class="r">${brl(x.c.valor)}</td><td class="r note">${brl(x.c.valor/2)} cada</td></tr>`).join("")}</tbody></table></div></div>`:""}`;
 }
 
 /* ----- Cadastros ----- */
@@ -982,7 +1088,7 @@ function prodForm(p){const novo=!p.id;const cats=[...new Set([...CATS,...S.produ
     <div class="field wide" style="flex-direction:row;gap:8px;flex-wrap:wrap"><button class="btn primary" type="submit">Salvar</button><button class="btn" type="button" data-cancel>Cancelar</button><span style="flex:1"></span>${!novo?(UI.confirmDel===p.id?`<button class="btn danger" type="button" data-delx="produtos/${esc(p.id)}">Confirmar exclusão</button>`:`<button class="btn ghost danger" type="button" data-askdelx="${esc(p.id)}">Excluir</button>`):""}</div></form></div>`}
 function histTable(rows,del){const [A,B]=SOCIAS();
   return `<div class="tbl"><table><thead><tr><th>Data</th><th>O quê</th><th>Pago por</th><th class="r">Valor</th>${del?"<th></th>":""}</tr></thead><tbody>
-  ${rows.map(l=>`<tr><td class="num">${fmtDM(l.data)}</td><td><b style="font-weight:700">${esc(l.descricao||"")}</b>${l.tipo==="abastecimento"&&l.qtd?` <span class="note">${n0(l.qtd)} × ${brl(l.unit)}</span>`:""}<br><span class="note">${esc(TIPO[l.tipo]||l.tipo)} · ${esc(NEG[l.negocio]||l.negocio||"")}${l.fornecedorId&&fornNome(l.fornecedorId)?" · "+esc(fornNome(l.fornecedorId)):""}</span></td><td>${esc(l.tipo==="distribuicao"||l.tipo==="acerto"?l.pagoPor+" → "+(l.pagoPor===A?B:A):l.pagoPor||"")}</td><td class="r">${brl(l.valor)}</td>
+  ${rows.map(l=>`<tr><td class="num">${fmtDM(l.data)}</td><td><b style="font-weight:700">${esc(l.descricao||"")}</b>${l.tipo==="abastecimento"&&l.qtd?` <span class="note">${n0(l.qtd)} × ${brl(l.unit)}</span>`:""}<br><span class="note">${esc(l.tipo==="despesa"&&l.categoria?l.categoria:TIPO[l.tipo]||l.tipo)} · ${esc(NEG[l.negocio]||l.negocio||"")}${l.fornecedorId&&fornNome(l.fornecedorId)?" · "+esc(fornNome(l.fornecedorId)):""}</span></td><td>${esc(l.tipo==="distribuicao"||l.tipo==="acerto"?l.pagoPor+" → "+(l.pagoPor===A?B:A):l.pagoPor||"")}</td><td class="r">${brl(l.valor)}</td>
   ${del?`<td class="r">${S.canWrite?(UI.confirmDel===l.id?`<button class="btn small danger" data-delx="lancamentos/${esc(l.id)}">Confirmar</button>`:`<button class="btn small ghost" data-askdelx="${esc(l.id)}">Excluir</button>`):""}</td>`:""}</tr>`).join("")}</tbody></table></div>`}
 function vHistorico(){let rows=S.lancamentos.slice().sort((x,y)=>(y.data||"")<(x.data||"")?-1:(y.data||"")>(x.data||"")?1:0);if(UI.hFil!=="todos")rows=rows.filter(l=>l.tipo===UI.hFil);
   return `<div class="card"><div class="card-head"><div><h2>Tudo o que foi lançado</h2><p class="sub">${rows.length} lançamentos · ${brl(rows.reduce((s,l)=>s+(+l.valor||0),0))}</p></div>
@@ -1042,9 +1148,10 @@ function renderSheet(){
       <div class="field wide" style="position:sticky;bottom:-30px;background:var(--panel);padding:10px 0"><button class="btn orange" type="submit">${isC?"Salvar contagem":"Salvar reposição"}</button></div></form>`}
   else if(SH.tipo==="despesa"){title="Compra ou despesa";const neg=SH.neg||"mm";
     body=`<form class="form" data-form="sh-despesa">
-      <div class="field"><label for="sh-tipo">Tipo</label><select id="sh-tipo" name="tipo"><option value="investimento">Equipamento ou obra</option><option value="despesa">Despesa do dia a dia</option></select></div>
+      <div class="field"><label for="sh-tipo">Tipo</label><select id="sh-tipo" name="tipo"><option value="despesa"${neg!=="mm"?" selected":""}>Despesa do dia a dia</option><option value="investimento"${neg==="mm"?" selected":""}>Equipamento ou obra</option></select></div>
       <div class="field"><label for="sh-neg">De qual negócio</label><select id="sh-neg" name="negocio">${["g1","g2","geladeiras","mm","geral"].map(k=>`<option value="${k}"${neg===k?" selected":""}>${NEG[k]}</option>`).join("")}</select></div>
       <div class="field wide"><label for="sh-desc">O que foi</label><input id="sh-desc" name="descricao" required placeholder="ex.: Toldo, energia de novembro"></div>
+      <div class="field"><label for="sh-cat">Categoria <span class="note">(despesa do dia a dia)</span></label><input id="sh-cat" name="categoria" list="dl-cat" placeholder="Escolha ou escreva uma nova" autocomplete="off"><datalist id="dl-cat">${catsDesp().map(c=>`<option value="${esc(c)}">`).join("")}</datalist></div>
       <div class="field"><label for="sh-valor">Valor (R$)</label><input id="sh-valor" name="valor" inputmode="decimal" required></div>
       <div class="field"><label for="sh-data">Data</label><input id="sh-data" type="date" name="data" value="${HOJE}" required></div>
       <div class="field"><label for="sh-pago">Pago com</label><select id="sh-pago" name="pagoPor">${["Dinheiro do empréstimo","Caixa do negócio",A,B].map(p=>`<option${neg!=="mm"&&p==="Caixa do negócio"?" selected":""}>${esc(p)}</option>`).join("")}</select></div>
@@ -1167,6 +1274,9 @@ document.addEventListener("click",async e=>{
   if(t.dataset.sepck){const id=t.dataset.sepck;if(UI.sep[id])delete UI.sep[id];else UI.sep[id]=1;try{localStorage.setItem("ahshe-sep-"+HOJE,JSON.stringify(UI.sep))}catch(err){}render();return}
   if(t.dataset.ponto){UI.ponto=t.dataset.ponto;render();return}
   if(t.dataset.baixa){try{await DB.doc("lancamentos/"+t.dataset.baixa).update({loteBaixado:true,baixadoEm:new Date().toISOString()});toast("Lote marcado como retirado")}catch(err){toast(erroMsg(err))}return}
+  if(t.dataset.fin){UI.fin=t.dataset.fin;UI.confirmDel=null;render();return}
+  if(t.dataset.fneg){UI.fneg=t.dataset.fneg;UI.fcat="todas";render();return}
+  if(t.dataset.fcat){UI.fcat=t.dataset.fcat;render();return}
   if(t.dataset.maq){UI.maq=t.dataset.maq;render();return}
   if(t.dataset.estloc){UI.estLocal=t.dataset.estloc;UI.confirmDel=null;render();return}
   if(t.dataset.cad){UI.cad=t.dataset.cad;UI.editForn=UI.editProd=null;UI.busca="";render();return}
@@ -1226,7 +1336,16 @@ document.addEventListener("submit",async e=>{const f=e.target;if(!f.dataset.form
       await DB.collection("movimentos").add(k==="sh-repor"?{tipo:"reposicao",de:"deposito",para:loc,itens,data:fd.get("data"),criadoEm:agora,criadoPor:S.me||null}:{tipo:"contagem",local:loc,itens,data:fd.get("data"),criadoEm:agora,criadoPor:S.me||null});
       closeSheet();toast(k==="sh-repor"?"Reposição salva":"Contagem salva")}
     if(k==="sh-despesa"){const v=parseNum(fd.get("valor"));if(!isFinite(v))throw {msg:"Confira o valor."};
-      await DB.collection("lancamentos").add({tipo:fd.get("tipo"),negocio:fd.get("negocio"),data:fd.get("data"),descricao:String(fd.get("descricao")||"").trim(),valor:v,pagoPor:fd.get("pagoPor"),fornecedorId:fd.get("fornecedorId")||"",financiado:false,criadoEm:agora,criadoPor:S.me||null});closeSheet();toast("Lançado")}
+      const tipo=fd.get("tipo");let cat=String(fd.get("categoria")||"").trim();const cats=catsDesp();const igual=cats.find(c=>norm(c)===norm(cat));if(igual)cat=igual;
+      const doc={tipo,negocio:fd.get("negocio"),data:fd.get("data"),descricao:String(fd.get("descricao")||"").trim(),valor:v,pagoPor:fd.get("pagoPor"),fornecedorId:fd.get("fornecedorId")||"",financiado:false,criadoEm:agora,criadoPor:S.me||null};
+      if(tipo==="despesa"&&cat)doc.categoria=cat;await DB.collection("lancamentos").add(doc);
+      if(tipo==="despesa"&&cat&&!igual)await DB.doc("config/geral").update({catDespesa:[...cats,cat]});closeSheet();toast("Lançado")}
+    if(k==="catnova"){const n=String(fd.get("nome")||"").trim();if(!n)throw {msg:"Escreva o nome da categoria."};const cats=catsDesp();if(cats.some(c=>norm(c)===norm(n)))throw {msg:"Essa categoria já existe."};
+      await DB.doc("config/geral").update({catDespesa:[...cats,n]});toast("Categoria criada")}
+    if(k==="catren"){const old=f.dataset.old;const n=String(fd.get("nome")||"").trim();if(!n)throw {msg:"O nome não pode ficar vazio."};
+      if(n!==old){const cats=catsDesp();if(cats.some(c=>c!==old&&norm(c)===norm(n)))throw {msg:"Já existe uma categoria com esse nome."};
+        const ls=S.lancamentos.filter(l=>l.tipo==="despesa"&&l.categoria===old);for(const l of ls)await DB.doc("lancamentos/"+l.id).update({categoria:n});
+        await DB.doc("config/geral").update({catDespesa:cats.map(c=>c===old?n:c)});if(UI.fcat===old)UI.fcat=n;toast("Categoria renomeada")}}
     if(k==="sh-repasse"){const v=parseNum(fd.get("valor"));if(!isFinite(v))throw {msg:"Confira o valor."};const tipo=fd.get("tipo");const ref=fd.get("ref");
       const doc={tipo,negocio:"geral",data:fd.get("data"),descricao:String(fd.get("descricao")||"").trim()||(tipo==="distribuicao"?"Repasse de lucro":"Acerto de despesa"),valor:v,pagoPor:fd.get("pagoPor"),financiado:false,criadoEm:agora,criadoPor:S.me||null};
       if(ref)doc.refData=isoD(new Date(pd(ref).getTime()+10*864e5));await DB.collection("lancamentos").add(doc);closeSheet();toast("Lançado")}
