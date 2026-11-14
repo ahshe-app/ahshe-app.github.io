@@ -226,6 +226,50 @@ details.more[open]>summary::before{content:"−"}
 .chip.on{background:var(--petrol-soft);color:var(--petrol)}
 .editor{border-color:var(--petrol);box-shadow:0 0 0 4px var(--petrol-soft)}
 
+/* Início em cards */
+.hgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+@media (min-width:860px){.hgrid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (min-width:561px){.hc.v2{grid-column:span 2}}
+@media (max-width:560px){.hgrid{grid-template-columns:1fr 1fr;gap:10px}}
+.hc{all:unset;box-sizing:border-box;cursor:pointer;position:relative;display:flex;flex-direction:column;gap:3px;min-width:0;background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:16px;box-shadow:0 1px 2px rgba(20,40,55,.04),0 6px 18px -12px rgba(20,40,55,.18);transition:transform .12s ease,box-shadow .12s ease,border-color .12s}
+.hc:hover{border-color:var(--petrol-2);box-shadow:0 2px 4px rgba(20,40,55,.06),0 12px 26px -14px rgba(20,40,55,.28)}
+.hc:active{transform:scale(.985)}
+.hc:focus-visible{outline:3px solid var(--petrol-2);outline-offset:2px}
+.hc.wide{grid-column:1/-1}
+.hc.plain{cursor:default}.hc.plain:hover{border-color:var(--line)}.hc.plain:active{transform:none}
+.hc-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:10px}
+.hc .ic{width:42px;height:42px;border-radius:13px;background:var(--petrol-soft);color:var(--petrol);display:grid;place-items:center;flex:none}
+.hc .ic svg{width:23px;height:23px}
+.hc .ic.ok{background:var(--ok-soft);color:var(--ok)}
+.hc .ic.warm{background:var(--orange-soft);color:#C9560F}
+.hc-top>svg{width:22px;height:22px;opacity:.8}
+.hc-k{font-size:12.5px;font-weight:800;color:var(--muted);letter-spacing:.01em}
+.hc-v{font-family:var(--display);font-size:clamp(20px,5.4vw,27px);font-weight:800;line-height:1.1;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.hc-s{font-size:12.5px;color:var(--muted);font-weight:600;line-height:1.35}
+.hc .warn-t{color:#B5530E;font-weight:700}
+.hc .badge{min-width:24px;height:24px;border-radius:12px;background:var(--orange);color:#fff;font-size:12.5px;font-weight:800;display:grid;place-items:center;padding:0 7px;box-sizing:border-box}
+.hc .trend{font-size:12px;font-weight:800;padding:3px 8px;border-radius:99px;white-space:nowrap}
+.hc .trend.up{background:var(--ok-soft);color:var(--ok)}.hc .trend.down{background:var(--bad-soft);color:var(--bad)}
+.hc .spark{display:block;width:100%;height:34px;margin-top:8px}
+.hc.hero{background:linear-gradient(135deg,#C9560F,#EC6A1C);border-color:#C9560F;color:#fff;padding:18px 20px}
+.hc.hero .ic{background:rgba(255,255,255,.18);color:#fff}.hc.hero .hc-k{color:#FFE2CF;text-transform:uppercase;letter-spacing:.06em}.hc.hero .hc-s{color:#FFE7D8}
+.hc.hero .hc-v{font-size:clamp(22px,6vw,30px)}
+.hc.calm{background:var(--ok-soft);border-color:#CBE6D6}
+.hc-dots{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.hc-dot{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:800;border-radius:99px;padding:5px 10px;background:rgba(255,255,255,.18);color:inherit}
+.hc-dot i{width:9px;height:9px;border-radius:50%;box-shadow:0 0 0 2px rgba(255,255,255,.85)}
+.hc.calm .hc-dot{background:#fff;color:var(--ink)}
+.hc-dot.ok{opacity:.75}
+.hc-acts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:10px}
+.hc-acts button{all:unset;cursor:pointer;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 4px;border-radius:16px;background:var(--soft);color:var(--petrol);font-weight:800;font-size:12.5px;text-align:center;line-height:1.15}
+.hc-acts button:hover{background:var(--petrol-soft)}
+.hc-acts svg{width:22px;height:22px}
+@media (max-width:560px){.hc.row-m{grid-column:1/-1;display:grid;grid-template-columns:auto 1fr auto;column-gap:14px;align-items:center}.hc.row-m .hc-top{grid-row:1/4;margin:0}.hc.row-m .hc-k{grid-column:2}.hc.row-m .hc-v{grid-column:3;grid-row:1/4;font-size:22px}.hc.row-m .hc-s{grid-column:2}}
+.hc-list{display:flex;flex-direction:column;margin-top:10px;border-top:1px solid var(--line)}
+.hc-list span{font-size:13.5px;font-weight:600;padding:9px 0;border-bottom:1px solid var(--line);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hc-list span:last-child{border-bottom:0}.hc-list .more{color:var(--muted)}
+.hc.inst{flex-direction:row;align-items:center;gap:12px;background:var(--petrol-soft);border-color:transparent}.hc.inst .hc-s{flex:1;color:var(--ink)}
+@media (prefers-reduced-motion:reduce){.hc{transition:none}.hc:active{transform:none}}
 /* Financeiro */
 .subtabs{display:flex;width:100%;box-sizing:border-box}
 .subtabs button{flex:1;text-align:center;padding:9px 6px}
@@ -697,58 +741,49 @@ function blocoPend(secs,titulo){
 function doneItem(p){return `<div style="margin-top:10px"><b>${esc(p.pergunta)}</b><div class="answer">${esc(pendShow(p))}<small>${p.respondidoEm?"em "+fmtData(p.respondidoEm):""}</small></div>${S.canWrite?`<button class="btn small ghost" data-pedit="${esc(p.id)}">Editar resposta</button>`:""}</div>`}
 
 /* ----- Início (cardápio) ----- */
+function spark(vals,cor){if(vals.length<2)return "";const mx=Math.max(...vals,1),w=120,h=34;const pts=vals.map((v,i)=>[i*w/(vals.length-1),h-3-(v/mx)*(h-6)]);
+  const d=pts.map((p,i)=>(i?"L":"M")+p[0].toFixed(1)+" "+p[1].toFixed(1)).join(" ");
+  return `<svg class="spark" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" aria-hidden="true"><path d="${d} L${w} ${h} L0 ${h} Z" fill="${cor}" opacity=".12"/><path d="${d}" fill="none" stroke="${cor}" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/></svg>`}
 function vInicio(){
   if(!ativosList().length)return `<div class="head"><div><h1>Bem-vinda ao app AHSHE</h1><p>Ainda não há dados aqui.</p></div></div><div class="card"><h2>Trazer os dados do painel</h2><p class="sub" style="margin-bottom:12px">Vá em Mais › Backup e importe o arquivo que a Claude te mandou.</p><button class="btn primary" data-tab="mais" data-cadgo="backup">Abrir Backup</button></div>`;
-  const per=periodoRef();const ex=extrato();const [A,B]=SOCIAS();
-  const est=estoque();const R0=rota(est);const venc=vencendo(est,7);
+  const per=periodoRef();const ids=todosIds();
+  const est=estoque();const R0=rota(est);const venc=vencendo(est,7);const vencidos=venc.filter(x=>x.dias<0).length;
   const fins=Object.values(S.financiamentos).map(f=>({f,r:finResumo(f)}));const prox=fins.map(x=>x.r.prox&&Object.assign({nome:x.f.nome},x.r.prox)).filter(Boolean).sort((a,b)=>a.dt-b.dt);
   const proxMes=prox.length?prox[0].mes:null;const proxTot=prox.filter(p=>p.mes===proxMes).reduce((s,p)=>s+p.valor,0);
-  const baixos=S.produtos.filter(p=>+p.minDeposito>0&&((est.E.deposito||{})[p.id]||{qtd:0}).qtd<+p.minDeposito).length;
+  const D=est.E.deposito||{};const baixos=S.produtos.filter(p=>+p.minDeposito>0&&(D[p.id]||{qtd:0}).qtd<+p.minDeposito).length;
+  const need={};R0.pontos.forEach(p=>p.lista.forEach(x=>need[x.p.id]=(need[x.p.id]||0)+x.falta));
+  const comprar=S.produtos.filter(p=>{const tem=D[p.id]?Math.max(0,D[p.id].qtd):0;const quer=(need[p.id]||0)+(+p.minDeposito||0);return quer>0&&quer-tem>0}).length;
   const uv=ultVenda();const ontem=isoD(new Date(today.getTime()-864e5));
   const dVend=uv?S.vendas.filter(v=>v.data===uv).reduce((s,v)=>s+(+v.receita||0),0):0;
-  const kVend=!uv?"Vendas":uv===HOJE?"Vendas hoje":uv===ontem?"Vendas ontem":"Vendas "+fmtDM(uv);
-  const Rp=per?lucroEntre(per.ini,per.fim,ativosList().map(a=>a.id)):null;
-  const np=pendAbertas().length;
-  const al=[];
-  vendings().forEach(a=>{if(a.status!=="operando")return;const u=ultVenda(a.id);
-    if(!u)al.push(["warn",`${a.nome}: ainda sem vendas importadas.`,"importar"]);
-    else if(diasEntre(u,HOJE)>4)al.push(["warn",`${curto(a)}: vendas importadas só até ${fmtDM(u)}.`,"importar"])});
-  if(venc.length){const vencidos=venc.filter(x=>x.dias<0).length;al.push(["warn",vencidos?`${vencidos} lote${vencidos>1?"s":""} vencido${vencidos>1?"s":""} e ${venc.length-vencidos} vencendo nos próximos dias.`:`${venc.length} lote${venc.length>1?"s":""} vencendo nos próximos 7 dias.`,"estoque"])}
-  if(baixos)al.push(["warn",`${baixos} produto${baixos>1?"s":""} abaixo do mínimo no depósito.`,"comprar"]);
-  if(prox.length&&(prox[0].dt-today)/864e5<=7)al.push(["info",`Parcela de ${brl(proxTot)} vence ${prox[0].diaIncerto?"este mês":"em "+fmtDM(isoD(prox[0].dt))}.`,null]);
-  const acoes=al.length?`<div class="alerts">${al.map(([t,txt,go])=>`<div class="alert ${t==="info"?"info":""}">${t==="info"?I.info:I.alert}<span>${esc(txt)}</span>${go==="importar"&&S.canWrite?`<button class="btn small" data-sheet="importar">Importar</button>`:go?`<button class="btn small" data-tab="${go}">Ver</button>`:""}</div>`).join("")}</div>`:"";
-  const semCont=R0.pontos.filter(p=>!p.tracked).length;
-  const hoje=R0.nPontos?`<button class="today" data-tab="abastecer"><span class="ic">${I.truck}</span><span style="flex:1;min-width:0"><small>PARA HOJE</small><b>${R0.nPontos} ponto${R0.nPontos>1?"s":""} para abastecer</b><span class="s">${esc(R0.pontos.filter(p=>p.precisa).map(p=>curto(p.a)).join(" e "))} · ${n0(R0.itens)} itens</span></span>${I.next}</button>`
-    :`<button class="today ok" data-tab="abastecer"><span class="ic">${I.check}</span><span style="flex:1;min-width:0"><small>ABASTECIMENTO</small><b>${semCont===R0.pontos.length?"Comece pela contagem":"Tudo abastecido"}</b><span class="s">${semCont===R0.pontos.length?"Conte o que tem em cada ponto e o app passa a avisar":semCont?semCont+" ponto"+(semCont>1?"s":"")+" ainda sem contagem":"Nenhum ponto precisa de reposição agora"}</span></span>${I.next}</button>`;
+  const kVend=!uv?"Vendas":uv===HOJE?"Vendas hoje":uv===ontem?"Vendas ontem":"Vendas em "+fmtDM(uv);
+  const serie=[];if(uv){const fim=pd(uv);for(let i=13;i>=0;i--){const d=isoD(new Date(fim.getTime()-i*864e5));serie.push(S.vendas.filter(v=>v.data===d).reduce((s,v)=>s+(+v.receita||0),0))}}
+  const media=serie.length?serie.slice(0,13).reduce((s,v)=>s+v,0)/13:0;const varV=media?(dVend-media)/media:null;
+  const atras=vendings().filter(a=>a.status==="operando").map(a=>({a,u:ultVenda(a.id)})).filter(x=>!x.u||diasEntre(x.u,HOJE)>4);
+  const Rp=per?lucroEntre(per.ini,per.fim,ids):null;const sobra=Rp?Rp.lucro-parcelasEntre(per.ini,per.fim,ids):0;
+  const np=pendAbertas().length;const semCont=R0.pontos.filter(p=>!p.tracked).length;
   const hr=new Date().getHours();const quem=S.meNome||SOCIAS().find(n=>S.meEmail&&norm(S.meEmail).includes(norm(n).slice(0,4)))||"";
-  const tile=(tab,ic,t,sub,cls="",badge=0,attr="")=>`<button class="tile ${cls}" ${attr||`data-tab="${tab}"`}><span class="ic">${ic}</span>${badge?`<span class="badge">${badge}</span>`:""}<span><b>${t}</b><small>${esc(sub)}</small></span></button>`;
-  const acab=baixos+venc.length;
+  const card=({go,attr,ic,k,v,s,tag,cls="",extra="",tone=""})=>`<button class="hc ${cls}" ${attr||`data-tab="${go}"`}><span class="hc-top"><span class="ic${tone?" "+tone:""}">${ic}</span>${tag||""}</span><span class="hc-k">${k}</span><span class="hc-v">${v}</span>${s?`<span class="hc-s">${s}</span>`:""}${extra}</button>`;
+  const pill=(t,txt)=>`<span class="pill ${t}">${esc(txt)}</span>`;
+  const dots=R0.pontos.map(p=>{const done=p.hoje||(p.tracked&&!p.lista.length);return `<span class="hc-dot${done?" ok":""}"><i style="background:${COR[p.a.id]||COR.g1}"></i>${esc(curto(p.a))}${done?" ✓":!p.tracked?" ·  contar":` · ${n0(p.lista.reduce((s,x)=>s+x.falta,0))}`}</span>`}).join("");
+  const pdv=R0.nPontos?card({go:"abastecer",cls:"wide hero",ic:I.truck,k:"Para hoje",v:`${R0.nPontos} ponto${R0.nPontos>1?"s":""} para abastecer`,s:`${n0(R0.itens)} itens no total`,tag:I.next,extra:`<span class="hc-dots">${dots}</span>`})
+    :card({go:"abastecer",cls:"wide calm",ic:I.check,tone:"ok",k:"Abastecimento",v:semCont===R0.pontos.length?"Comece pela contagem":semCont?"Falta contar "+semCont+" ponto"+(semCont>1?"s":""):"Tudo abastecido",s:semCont?"Conte o que tem em cada ponto e o app passa a sugerir a reposição":"Nenhum ponto precisa de reposição agora",tag:I.next,extra:`<span class="hc-dots">${dots}</span>`});
+  const estAl=venc.length+baixos;
+  const cards=[
+    card({go:"vendas",cls:"v2",ic:I.chart,k:kVend,v:uv?brl0(dVend):"—",tag:varV!=null&&isFinite(varV)&&Math.abs(varV)>=0.005?`<span class="trend ${varV>=0?"up":"down"}">${varV>=0?"▲":"▼"} ${pct(Math.abs(varV))}</span>`:"",
+      s:atras.length?`<span class="warn-t">${esc(atras.map(x=>curto(x.a)).join(" e "))} sem vendas recentes</span>`:media?"média de "+brl0(media)+" por dia":"",extra:spark(serie,"var(--petrol-2)")}),
+    card({go:"financeiro",attr:`data-tab="financeiro" data-fingo="resultado"`,ic:I.wallet,k:"Lucro"+(per?" "+esc(per.curto):""),v:Rp&&Rp.dias?brl0(Rp.lucro):"—",s:Rp&&Rp.dias?"sobra "+brl0(sobra)+" · "+brl0(sobra/2)+" cada":"sem vendas no período",tone:"ok"}),
+    card({go:"estoque",ic:I.box,k:"Estoque",v:estAl?estAl+" alerta"+(estAl>1?"s":""):"Em dia",s:estAl?[vencidos?vencidos+" vencido"+(vencidos>1?"s":""):"",venc.length-vencidos?(venc.length-vencidos)+" vencendo":"",baixos?baixos+" abaixo do mínimo":""].filter(Boolean).join(" · "):"validade e depósito ok",tone:estAl?"warm":"",tag:estAl?pill(vencidos?"bad":"warn",vencidos?"Vencido":"Atenção"):""}),
+    card({go:"comprar",ic:I.cart,k:"Abastecer Estoque",v:comprar?comprar+" para comprar":"Nada a comprar",s:comprar?"para cobrir a rota e o mínimo":"depósito cobre a rota",tone:comprar?"warm":""}),
+    prox.length?card({cls:"row-m",attr:`data-tab="financeiro" data-fingo="financiamentos"`,ic:I.coin,k:"Próxima parcela",v:brl0(proxTot),s:(prox[0].diaIncerto?fmtMesC(prox[0].mes):fmtData(isoD(prox[0].dt)))+" · "+brl0(proxTot/2)+" cada",tone:(prox[0].dt-today)/864e5<=7?"warm":""}):""
+  ].join("");
+  const lancar=S.canWrite?`<div class="hc wide plain"><span class="hc-k">Lançar rápido</span><span class="hc-acts">
+      <button data-sheet="contagem">${I.clip}<span>Contagem</span></button><button data-sheet="despesa" data-neg="geral">${I.coin}<span>Despesa</span></button><button data-sheet="repasse">${I.swap}<span>Repasse</span></button><button data-sheet="importar">${I.up}<span>Importar vendas</span></button></span></div>`:"";
+  const inst=window.__podeInstalar?`<div class="hc wide plain inst"><span class="hc-s">Instale o app na tela inicial do celular.</span><button class="btn small primary" data-instalar>Instalar</button></div>`:window.__ios&&!window.__standalone?`<div class="hc wide plain inst"><span class="hc-s">Para instalar no iPhone: toque em Compartilhar e depois em "Adicionar à Tela de Início".</span></div>`:"";
+  const pa=pendAbertas().slice(0,3);
+  const pend=card({go:"pendencias",cls:"wide pend",ic:I.todo,tone:np?"warm":"ok",k:"Pendências",v:np?np+" para resolver":"Tudo resolvido",tag:np?`<span class="badge">${np}</span>`:I.next,
+    extra:np?`<span class="hc-list">${pa.map(p=>`<span>${esc(p.pergunta)}</span>`).join("")}${np>3?`<span class="more">e mais ${np-3}</span>`:""}</span>`:""});
   return `<div class="hello"><small>${DIAS[today.getDay()].toLowerCase()}, ${today.getDate()} de ${MESES_L[today.getMonth()].toLowerCase()}</small><h1>${hr<12?"Bom dia":hr<18?"Boa tarde":"Boa noite"}${quem?", "+esc(quem):""}</h1></div>
-  <section>
-    ${window.__podeInstalar?`<div class="install"><span>Instale o app na tela inicial do celular.</span><button class="btn small primary" data-instalar>Instalar</button></div>`:window.__ios&&!window.__standalone?`<div class="install"><span>Para instalar no iPhone: toque em Compartilhar e depois em "Adicionar à Tela de Início".</span></div>`:""}
-    ${hoje}
-    <div class="mini3">
-      <button class="mini" data-tab="vendas"><span class="k">${kVend}</span><span class="v">${uv?brl0(dVend):"—"}</span></button>
-      <button class="mini" data-tab="financeiro"><span class="k">Lucro${per?" "+esc(per.curto):""}</span><span class="v">${Rp&&Rp.dias?brl0(Rp.lucro):"—"}</span></button>
-      <button class="mini${np?" hot":""}" data-tab="pendencias"><span class="k">Pendências</span><span class="v">${np||"0"}</span></button>
-    </div>
-    ${acoes}
-    <h2 class="h2s">O que você quer fazer?</h2>
-    <div class="menu">
-      ${tile("abastecer",I.truck,"Abastecer PDV",R0.nPontos?R0.nPontos+" ponto"+(R0.nPontos>1?"s":"")+" hoje":"rota dos pontos","hero")}
-      ${tile("comprar",I.cart,"Abastecer Estoque","compras e entradas")}
-      ${tile("estoque",I.box,"Estoque",acab?acab+" para olhar":"depósito e pontos","",acab)}
-      ${tile("vendas",I.chart,"Vendas","por ponto e dia")}
-      ${tile("financeiro",I.wallet,"Financeiro","resultado, despesas e sócias")}
-      ${tile("pendencias",I.todo,"Pendências",np?np+" para resolver":"tudo resolvido","warm",np)}
-    </div>
-    ${S.canWrite?`<div class="shortcuts">
-      <button class="shortcut" data-sheet="contagem">${I.clip}Contagem</button>
-      <button class="shortcut" data-sheet="despesa" data-neg="geral">${I.coin}Despesa</button>
-      <button class="shortcut" data-sheet="repasse">${I.swap}Repasse</button>
-      <button class="shortcut" data-sheet="importar">${I.up}Importar vendas</button>
-    </div>`:""}
-  </section>`;
+  <section><div class="hgrid">${inst}${pdv}${cards}${lancar}${pend}</div></section>`;
 }
 
 /* ----- Abastecer PDV (rota de hoje) ----- */
@@ -1270,7 +1305,7 @@ document.addEventListener("click",async e=>{
   if(t.hasAttribute("data-assoc")){associar();return}
   if(t.dataset.sheet){openSheet(t.dataset.sheet,{loc:t.dataset.loc,neg:t.dataset.neg,sug:!!t.dataset.sug});if(t.dataset.scan)abrirScanner(t.dataset.sheet==="compra"?"compra":"repor");return}
   if(t.dataset.go){if(t.dataset.maq&&t.dataset.go==="geladeiras")UI.maq=t.dataset.maq;setTab(t.dataset.go);return}
-  if(t.dataset.tab){if(t.dataset.cadgo)UI.cad=t.dataset.cadgo;setTab(t.dataset.tab);return}
+  if(t.dataset.tab){if(t.dataset.cadgo)UI.cad=t.dataset.cadgo;if(t.dataset.fingo)UI.fin=t.dataset.fingo;setTab(t.dataset.tab);return}
   if(t.dataset.sepck){const id=t.dataset.sepck;if(UI.sep[id])delete UI.sep[id];else UI.sep[id]=1;try{localStorage.setItem("ahshe-sep-"+HOJE,JSON.stringify(UI.sep))}catch(err){}render();return}
   if(t.dataset.ponto){UI.ponto=t.dataset.ponto;render();return}
   if(t.dataset.baixa){try{await DB.doc("lancamentos/"+t.dataset.baixa).update({loteBaixado:true,baixadoEm:new Date().toISOString()});toast("Lote marcado como retirado")}catch(err){toast(erroMsg(err))}return}
